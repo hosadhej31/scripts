@@ -1,5 +1,5 @@
 local utils = {}
-function utils:RandomString(string)
+function utils:RandomString(length)
 	local chars = {};
 
 	for i = ("a"):byte(), ("z"):byte() do
