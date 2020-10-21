@@ -1,5 +1,28 @@
 local utils = {}
-function Utils:CreateEsp(Options)
+function utils:RandomString(string)
+	local chars = {};
+
+	for i = ("a"):byte(), ("z"):byte() do
+	    table.insert(chars, string.char(i));
+	end;
+
+	for i = ("A"):byte(), ("Z"):byte() do
+	    table.insert(chars, string.char(i));
+	end;
+
+	for i = ("0"):byte(), ("9"):byte() do
+	    table.insert(chars, string.char(i));
+	end;
+
+	local str = "";
+
+    	for i = 1, length do
+		str = str .. chars[math.random(1, #chars)];
+    	end;
+
+    	return str;	
+end
+function utils:CreateEsp(Options)
 	local options = (Options or Default = {
 		EspName = "Esp",
 		Parent = game.CoreGui,
