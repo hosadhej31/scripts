@@ -22,6 +22,7 @@ function utils:RandomString(length)
 
     	return str;	
 end
+--[[
 function utils:CreateEsp(Options)
 	local options = (Options or Default = {
 		EspName = "Esp",
@@ -68,4 +69,5 @@ function utils:CreateEsp(Options)
   TextLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
   TextLabel.TextColor3 = options.Color
 end
+--]]
 return utils
