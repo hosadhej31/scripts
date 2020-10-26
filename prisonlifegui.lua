@@ -292,11 +292,11 @@ if (funcSupported) then
     end))
 end
 local themes = {
-    Background = Color3.fromRGB(24, 24, 24),
-    Accent = Color3.fromRGB(10, 10, 10),
+    Background = Color3.fromRGB(40,40,40),
+    Accent = Color3.fromRGB(60,60,60),
     Glow = Color3.fromRGB(0, 0, 0),
-    LightContrast = Color3.fromRGB(20, 20, 20),
-    DarkContrast = Color3.fromRGB(14, 14, 14),  
+    LightContrast = Color3.fromRGB(35,35,35),
+    DarkContrast = Color3.fromRGB(30,30,30),  
     TextColor = Color3.fromRGB(255, 255, 255)
 }
 for theme, color in pairs(themes) do 
