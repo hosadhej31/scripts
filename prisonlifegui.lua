@@ -310,6 +310,10 @@ end)
 
 -- Gui Settings
 window:SelectPage(guncheats, true)
+window:setTheme("DarkConstrast", Color3.fromRGB(30, 30, 30))
+window:setTheme("LightConstrast", Color3.fromRGB(35, 35, 35))
+window:setTheme("Background", Color3.fromRGB(40, 40, 40))
+window:setTheme("Accent", Color3.fromRGB(60, 60, 60))
 
 -- Functions
 function CreateGunCheats()
