@@ -13,6 +13,7 @@ EspLib.Options = {
     Health = false,
     Distance = false,
     Tracer = false,
+    Font = 0
 }
 
 EspLib.Services = setmetatable({}, {
@@ -88,6 +89,7 @@ local function CreateEsp(Player)
             Objects.Name.Outline = true
             Objects.Name.OutlineColor = Color3.fromRGB(0, 0, 0)
             Objects.Name.Position = Vector2.new(Head2dPosition.X, Head2dPosition.Y)
+            Objects.Name.Font = EspLib.Options.Font
     
             if (EspLib.Options.TeamColor) then
                 Objects.Name.Color = Player.Team.TeamColor.Color
