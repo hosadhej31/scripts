@@ -58,7 +58,7 @@ local function CreateEsp(Player)
     local Head2dPosition, OnScreen = workspace.CurrentCamera:WorldToScreenPoint(HeadPosition)
     local Origin = workspace.CurrentCamera.CFrame.p
     local HeadPos = Player.Character.Head.Position
-    local IgnoreList = { Player.Character, workspace.Ray_Ignore, EspLib.Services.Players.LocalPlayer.Character }
+    local IgnoreList = { Player.Character, EspLib.Services.Players.LocalPlayer.Character }
     local PlayerRay = Ray.new(Origin, HeadPos - Origin)
     local Hit = workspace:FindPartOnRayWithIgnoreList(PlayerRay, IgnoreList)
 
