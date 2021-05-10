@@ -114,10 +114,10 @@ Esp.Add = function(plr, root, col)
 				Holder.Box.Size = BoxSize
 				Holder.Box.Position = v2new(Pos.X - BoxSize.X / 2, Pos.Y - BoxSize.Y / 2)
 
-				Holder.Box1.Size = v2new(BoxSize.X + 1, BoxSize.Y + 1)
+				Holder.Box1.Size = v2new(BoxSize.X + 2, BoxSize.Y + 2)
 				Holder.Box1.Position = v2new((Pos.X - BoxSize.X / 2) - 2, (Pos.Y - BoxSize.Y / 2) - 2)
 
-				Holder.Box2.Size = v2new(BoxSize.X - 1, BoxSize.Y - 1)
+				Holder.Box2.Size = v2new(BoxSize.X - 2, BoxSize.Y - 2)
 				Holder.Box2.Position = v2new((Pos.X - BoxSize.X / 2) + 2, (Pos.Y - BoxSize.Y / 2) + 2)
 
 				Holder.Health.Color = Color3.fromRGB(255 - ((Health / 100) * 255), (Health / 100) * 255, 0)
