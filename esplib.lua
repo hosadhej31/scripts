@@ -9,7 +9,7 @@ local Esp = {
 		Tracer = false,
         TeamCheck = false,
 		TextSize = 16,
-        TextFont = Drawing.Fonts.Plex,
+        TextFont = "Plex",
         Range = 0
 	}
 }
@@ -71,7 +71,7 @@ Esp.Add = function(plr, root, col)
 
     Holder.Name.Text = plr.Name
     Holder.Name.Size = Esp.Settings.TextSize
-    Holder.Name.Font = Esp.Settings.TextFont
+    Holder.Name.Font = Drawing.Fonts[Esp.Settings.TextFont]
     Holder.Name.Center = true
 	Holder.Name.Color = col
     Holder.Name.Outline = true
@@ -95,7 +95,7 @@ Esp.Add = function(plr, root, col)
     Holder.Distance.Size = Esp.Settings.TextSize
     Holder.Distance.Center = true
 	Holder.Distance.Color = col
-    Holder.Distance.Font = Esp.Settings.TextFont
+    Holder.Distance.Font = Drawing.Fonts[Esp.Settings.TextFont]
 	Holder.Distance.Outline = true
 
 	Holder.Tracer.From = TracerStart
