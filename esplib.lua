@@ -127,9 +127,11 @@ Esp.Add = function(plr, root, col)
 				Holder.Distance.Text = math.floor((root.Position - Camera.CFrame.Position).Magnitude) .. " Studs"
 				Holder.Distance.Position = v2new(Pos.X, Pos.Y + BoxSize.X / 2 + 4)
 				Holder.Distance.Font = Esp.Settings.TextFont
+				Holder.Distance.Size = Esp.Settings.TextSize
 
 				Holder.Name.Position = v2new(Pos.X, Pos.Y - BoxSize.X / 2 - (4 + Esp.Settings.TextSize))
 				Holder.Name.Font = Esp.Settings.TextFont
+				Holder.Name.Size = Esp.Settings.TextSize
 
 				Holder.Tracer.To = v2new(Pos.X, Pos.Y + BoxSize.Y / 2)
 			end
