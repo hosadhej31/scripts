@@ -1,186 +1,220 @@
-local EspLib = {}
-EspLib.__index = EspLib
-local self = setmetatable(EspLib, {})
-
-EspLib.Options = {
-    Enable = false,
-    TeamCheck = false,
-    TeamColor = false,
-    VisibleOnly = false,
-    Color = Color3.fromRGB(255, 255, 255),
-    Name = false,
-    Box = false,
-    Health = false,
-    Distance = false,
-    Tracer = false
+local Esp = {
+	Container = {},
+	Settings = {
+		Enabled = false,
+        Name = false,
+		Box = false,
+		Health = false,
+		Distance = false,
+		Tracer = false,
+        TeamCheck = false,
+		TextSize = 16,
+        TextFont = Drawing.Fonts.Plex,
+        Range = 0
+	}
 }
 
-EspLib.Services = setmetatable({}, {
-    __index = function(Self, Index)
-        local GetService = game.GetService
-        local Service = GetService(game, Index)
+local Camera = workspace.CurrentCamera
+local WorldToViewportPoint = Camera.WorldToViewportPoint
+local v2new = Vector2.new
+local Player = game:GetService("Players").LocalPlayer
+local TracerStart = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y - 35)
 
-        if Service then
-            Self[Index] = Service
-        end
+local CheckVis = newcclosure(function(esp, inview)
+	if not inview or (Esp.Settings.TeamCheck and Esp.TeamCheck(esp.Player)) or (esp.Root.Position - Camera.CFrame.Position).Magnitude > Esp.Settings.Range then
+		esp.Name.Visible = false
+		esp.Box.Visible = false
+		esp.Health.Visible = false
+		esp.Distance.Visible = false
+		esp.Tracer.Visible = false
+		return
+	end
+    
+	esp.Name.Visible = Esp.Settings.Name
+	esp.Box.Visible = Esp.Settings.Box
+	esp.Health.Visible = Esp.Settings.Health
+	esp.Distance.Visible = Esp.Settings.Distance
+	esp.Tracer.Visible = Esp.Settings.Tracer
+end)
 
-        return Service
-    end
-})
+-- newcclosure breaks Drawing.new apparently
+Esp.Add = function(plr, root, col)
+	if Esp.Container[root] then
+        local Container = Esp.Container[root]
+        Container.Connection:Disconnect()
+		Container.Name:Remove()
+		Container.Box:Remove()
+		Container.Box1:Remove()
+		Container.Box2:Remove()
+		Container.Health:Remove()
+		Container.Distance:Remove()
+		Container.Tracer:Remove()
+		Esp.Container[root] = nil
+	end
+	local Holder = {
+		Name = Drawing.new("Text"),
+		Box = Drawing.new("Square"),
+		Box1 = Drawing.new("Square"),
+		Box2 = Drawing.new("Square"),
+		Health = Drawing.new("Square"),
+		Distance = Drawing.new("Text"),
+		Tracer = Drawing.new("Line"),
+		Player = plr,
+		Root = root,
+		Colour = col
+	}
+	Esp.Container[root] = Holder
 
-function EspLib:Toggle(state)
-    if (state) then
-        EspLib.Options.Enable = state
-    else
-        EspLib.Options.Enable = not EspLib.Options.Enable
-    end
+    Holder.Name.Text = plr.Name
+    Holder.Name.Size = Esp.Settings.TextSize
+    Holder.Name.Font = Esp.Settings.TextFont
+    Holder.Name.Center = true
+	Holder.Name.Color = col
+    Holder.Name.Outline = true
+
+    Holder.Box.Thickness = 1
+	Holder.Box.Color = col
+	Holder.Box.Filled = false
+
+	Holder.Box1.Thickness = 1
+	Holder.Box1.Color = Color3.fromRGB(0, 0, 0)
+	Holder.Box1.Filled = false
+
+	Holder.Box2.Thickness = 1
+	Holder.Box2.Color = Color3.fromRGB(0, 0, 0)
+	Holder.Box2.Filled = false
+
+	Holder.Health.Thickness = 1
+	Holder.Health.Color = Color3.fromRGB(0, 255, 0)
+    Holder.Health.Filled = true
+
+    Holder.Distance.Size = Esp.Settings.TextSize
+    Holder.Distance.Center = true
+	Holder.Distance.Color = col
+    Holder.Distance.Font = Esp.Settings.TextFont
+	Holder.Distance.Outline = true
+
+	Holder.Tracer.From = TracerStart
+	Holder.Tracer.Color = col
+    Holder.Tracer.Thickness = 1
+
+	Holder.Connection = game:GetService("RunService").Stepped:Connect(function()
+		if Esp.Settings.Enabled then
+			local Pos, Vis = WorldToViewportPoint(Camera, root.Position)
+			if Vis then
+				local X = 2200 / Pos.Z
+				local BoxSize = v2new(X, X * 1.4)
+				local Health = Esp.GetHealth(plr)
+				Holder.Name.Position = v2new(Pos.X, Pos.Y - BoxSize.X / 2 - (4 + Esp.Settings.TextSize))
+
+				Holder.Box.Size = BoxSize
+				Holder.Box.Position = v2new(Pos.X - BoxSize.X / 2, Pos.Y - BoxSize.Y / 2)
+
+				Holder.Box1.Size = v2new(BoxSize.X + 1, BoxSize.Y + 1)
+				Holder.Box1.Position = v2new((Pos.X - BoxSize.X / 2) - 2, (Pos.Y - BoxSize.Y / 2) - 2)
+
+				Holder.Box2.Size = v2new(BoxSize.X - 1, BoxSize.Y - 1)
+				Holder.Box2.Position = v2new((Pos.X - BoxSize.X / 2) + 2, (Pos.Y - BoxSize.Y / 2) + 2)
+
+				Holder.Health.Color = Health > 0.66 and Color3.new(0, 1, 0) or Health < 0.33 and Color3.new(1, 0, 0) or Color3.new(1, 1, 0)
+				Holder.Health.Size = v2new(1.5, BoxSize.Y * Health)
+				Holder.Health.Position = v2new(Pos.X - (BoxSize.X / 2 + 4), (Pos.Y - BoxSize.Y / 2) + ((1 - Health) * BoxSize.Y))
+
+				Holder.Distance.Text = math.floor((root.Position - Camera.CFrame.Position).Magnitude) .. " Studs"
+				Holder.Distance.Position = v2new(Pos.X, Pos.Y + BoxSize.X / 2 + 4)
+
+				Holder.Tracer.To = v2new(Pos.X, Pos.Y + BoxSize.Y / 2)
+			end
+			CheckVis(Holder, Vis)
+		elseif Holder.Name.Visible then
+			Holder.Name.Visible = false
+			Holder.Box.Visible = false
+			Holder.Box1.Visible = false
+			Holder.Box2.Visible = false
+			Holder.Health.Visible = false
+			Holder.Distance.Visible = false
+			Holder.Tracer.Visible = false
+		end
+	end)
 end
 
-function EspLib:SetOptions(options)
-    assert(options, "bad argument #1 to '?' (table expected, got no value)")
-    assert(type(options) == "table", "bad argument #1 to '? (table expected, got " .. type(options) .. ")")
-    EspLib.Options = options
+Esp.Remove = newcclosure(function(root)
+	for i, v in next, Esp.Container do
+		if i == root then
+			v.Connection:Disconnect()
+			v.Name:Remove()
+			v.Box:Remove()
+			v.Box1:Remove()
+			v.Box2:Remove()
+			v.Health:Remove()
+			v.Distance:Remove()
+			v.Tracer:Remove()
+		end
+	end
+	Esp.Container[root] = nil
+end)
+
+Esp.TeamCheck = newcclosure(function(plr)
+	return plr.Team == Player.Team
+end) -- can be overwritten for games that don't use default teams
+if game.PlaceId == 3233893879 then
+    Esp.TeamCheck = newcclosure(function(plr)
+        local Module = game:GetService("ReplicatedStorage").TS
+        Module = require(Module)
+        return Module.Teams:ArePlayersFriendly(Player, plr)
+    end)
 end
-
-local function GetDrawingObjects()
-    return {
-        Name = Drawing.new("Text"),
-        Box = Drawing.new("Quad"),
-        Tracer = Drawing.new("Line"),
-    }
-end
-
-local function CreateEsp(Player)
-    local Objects = GetDrawingObjects()
-    local Character = Player.Character
-    local Head = Character.Head
-    local HeadPosition = Head.Position
-    local Head2dPosition, OnScreen = workspace.CurrentCamera:WorldToScreenPoint(HeadPosition)
-    local Origin = workspace.CurrentCamera.CFrame.p
-    local HeadPos = Player.Character.Head.Position
-    local IgnoreList = { Player.Character, EspLib.Services.Players.LocalPlayer.Character }
-    local PlayerRay = Ray.new(Origin, HeadPos - Origin)
-    local Hit = workspace:FindPartOnRayWithIgnoreList(PlayerRay, IgnoreList)
-
-    local function Create()
-        if (OnScreen) then
-            local Name = ""
-            local Health = ""
-            local Distance = ""
-    
-            if (EspLib.Options.Name) then
-                Name = Player.Name
-            end
-    
-            if (EspLib.Options.Health) then
-                Health = " [ " .. Character.Humanoid.Health .. " ]"
-            end
-    
-            if (EspLib.Options.Distance) then
-                Distance = " [ " .. math.round((HeadPosition - workspace.CurrentCamera.CFrame.p).Magnitude) .. " ]"
-            end
-    
-            Objects.Name.Visible = true
-            Objects.Name.Transparency = 1
-            Objects.Name.Text = string.format("%s%s%s", Name, Health, Distance)
-            Objects.Name.Size = 18
-            Objects.Name.Center = true
-            Objects.Name.Outline = true
-            Objects.Name.OutlineColor = Color3.fromRGB(0, 0, 0)
-            Objects.Name.Position = Vector2.new(Head2dPosition.X, Head2dPosition.Y)
-    
-            if (EspLib.Options.TeamColor) then
-                Objects.Name.Color = Player.Team.TeamColor.Color
-            else
-                Objects.Name.Color = EspLib.Options.Color
-            end
-    
-            if (EspLib.Options.Box) then
-                local Part = Character.HumanoidRootPart
-                local Size = Part.Size * Vector3.new(1, 1.5)
-                local Sizes = {
-                    TopRight = (Part.CFrame * CFrame.new(-Size.X, -Size.Y, 0)).Position,
-                    BottomRight = (Part.CFrame * CFrame.new(-Size.X, Size.Y, 0)).Position,
-                    TopLeft = (Part.CFrame * CFrame.new(Size.X, -Size.Y, 0)).Position,
-                    BottomLeft = (Part.CFrame * CFrame.new(Size.X, Size.Y, 0)).Position,
-                }
-    
-                local TL, OnScreenTL = workspace.CurrentCamera:WorldToScreenPoint(Sizes.TopLeft)
-                local TR, OnScreenTR = workspace.CurrentCamera:WorldToScreenPoint(Sizes.TopRight)
-                local BL, OnScreenBL = workspace.CurrentCamera:WorldToScreenPoint(Sizes.BottomLeft)
-                local BR, OnScreenBR = workspace.CurrentCamera:WorldToScreenPoint(Sizes.BottomRight)
-    
-                if (OnScreenTL and OnScreenTR and OnScreenBL and OnScreenBR) then
-                    Objects.Box.Visible = true
-                    Objects.Box.Transparency = 1
-                    Objects.Box.Thickness = 2
-                    Objects.Box.Filled = false
-                    Objects.Box.PointA = Vector2.new(TL.X, TL.Y + 36)
-                    Objects.Box.PointB = Vector2.new(TR.X, TR.Y + 36)
-                    Objects.Box.PointC = Vector2.new(BR.X, BR.Y + 36)
-                    Objects.Box.PointD = Vector2.new(BL.X, BL.Y + 36)
-    
-                    if (EspLib.Options.TeamColor) then
-                        Objects.Box.Color = Player.Team.TeamColor.Color
-                    else
-                        Objects.Box.Color = EspLib.Options.Color
-                    end
-                end
-            end
-    
-            if (EspLib.Options.Tracer) then
-                local CharTorso = Character:FindFirstChild("Torso") or Character:FindFirstChild("UpperTorso")
-                local Torso, OnScreen = workspace.CurrentCamera:WorldToScreenPoint(CharTorso.Position)
-    
-                if (OnScreen) then
-                    Objects.Tracer.Visible = true
-                    Objects.Tracer.Transparency = 1
-                    Objects.Tracer.Thickness = 2
-                    Objects.Tracer.From = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y / 2)
-                    Objects.Tracer.To = Vector2.new(Torso.X, Torso.Y + 36)
-    
-                    if (EspLib.Options.TeamColor) then
-                        Objects.Tracer.Color = Player.Team.TeamColor.Color
-                    else
-                        Objects.Tracer.Color = EspLib.Options.Color
-                    end
-                end
-            end
+Esp.GetHealth = newcclosure(function(plr)
+	return plr.Character.Humanoid.Health / plr.Character.Humanoid.MaxHealth
+end) -- can be overwritten for games that don't use default characters
+if game.PlaceId == 292439477 then
+    local GetPlayerHealthTable
+    for I,V in pairs(getgc(true)) do
+        if type(V) == "table" and rawget(V, "getplayerhealth") and rawget(V, "isplayeralive") then
+            GetPlayerHealthTable = V
         end
     end
-
-    if (EspLib.Options.VisibleOnly) then
-        if (Hit == nil) then
-            Create()
-        end
-    else
-        Create()
-    end
-
-    EspLib.Services.RunService.Heartbeat:Wait()
-    EspLib.Services.RunService.Heartbeat:Wait()
-
-    Objects.Name:Remove()
-    Objects.Box:Remove()
-    Objects.Tracer:Remove()
+    Esp.GetHealth = newcclosure(function(plr)
+        return GetPlayerHealthTable:getplayerhealth(plr) / 100
+    end)
 end
+Esp.UpdateTextSize = newcclosure(function(num)
+	Esp.Settings.TextSize = num
+	for i, v in next, Esp.Container do
+		v.Name.Size = num
+		v.Distance.Size = num
+	end
+end)
 
-EspLib.Services.RunService.RenderStepped:Connect(function()
-    local LocalPlayer = EspLib.Services.Players.LocalPlayer
-
-    for i,v in pairs(EspLib.Services.Players:GetPlayers()) do
-        if (v.Name ~= LocalPlayer.Name) then
-            if (EspLib.Options.Enable) then
-                if (EspLib.Options.TeamCheck) then
-                    if (v.Team ~= LocalPlayer.Team) then
-                        CreateEsp(v)
-                    end
-                else
-                    CreateEsp(v)
-                end
-            end
-        end
+Esp.UpdateTracerStart = newcclosure(function(pos)
+    TracerStart = pos
+    for i, v in next, Esp.Container do
+        v.Tracer.From = pos
     end
 end)
 
-return EspLib
+Esp.ToggleRainbow = newcclosure(function(bool)
+	if Esp.RainbowConn then
+		Esp.RainbowConn:Disconnect()
+	end
+	if bool then
+		Esp.RainbowConn = game:GetService("RunService").Heartbeat:Connect(function()
+			local Colour = Color3.fromHSV(tick() % 12 / 12, 1, 1)
+			for i, v in next, Esp.Container do
+				v.Name.Color = Colour
+				v.Box.Color = Colour
+				v.Distance.Color = Colour
+				v.Tracer.Color = Colour
+			end
+		end)
+	else
+		for i, v in next, Esp.Container do
+			v.Name.Color = v.Colour
+			v.Box.Color = v.Colour
+			v.Distance.Color = v.Colour
+			v.Tracer.Color = v.Colour
+		end
+	end
+end)
+
+return Esp
