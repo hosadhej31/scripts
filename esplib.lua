@@ -21,9 +21,11 @@ local Player = game:GetService("Players").LocalPlayer
 local TracerStart = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y - 35)
 
 local CheckVis = newcclosure(function(esp, inview)
-	if not inview or (Esp.Settings.TeamCheck and Esp.TeamCheck(esp.Player)) or (esp.Root.Position - Camera.CFrame.Position).Magnitude > Esp.Settings.Range then
+	if not inview or (Esp.Settings.TeamCheck and not Esp.TeamCheck(esp.Player)) or (esp.Root.Position - Camera.CFrame.Position).Magnitude > Esp.Settings.Range then
 		esp.Name.Visible = false
 		esp.Box.Visible = false
+		esp.Box1.Visible = false
+		esp.Box2.Visible = false
 		esp.Health.Visible = false
 		esp.Distance.Visible = false
 		esp.Tracer.Visible = false
@@ -32,6 +34,8 @@ local CheckVis = newcclosure(function(esp, inview)
     
 	esp.Name.Visible = Esp.Settings.Name
 	esp.Box.Visible = Esp.Settings.Box
+	esp.Box1.Visible = Esp.Settings.Box
+	esp.Box2.Visible = Esp.Settings.Box
 	esp.Health.Visible = Esp.Settings.Health
 	esp.Distance.Visible = Esp.Settings.Distance
 	esp.Tracer.Visible = Esp.Settings.Tracer
