@@ -8,8 +8,8 @@ local Esp = {
 		Distance = false,
 		Tracer = false,
         TeamCheck = false,
-		TextSize = 16,
-        TextFont = "Plex",
+		TextSize = 13,
+        TextFont = Drawing.Fonts.Plex,
         Range = 0
 	}
 }
@@ -71,7 +71,7 @@ Esp.Add = function(plr, root, col)
 
     Holder.Name.Text = plr.Name
     Holder.Name.Size = Esp.Settings.TextSize
-    Holder.Name.Font = Drawing.Fonts[Esp.Settings.TextFont]
+    Holder.Name.Font = Esp.Settings.TextFont
     Holder.Name.Center = true
 	Holder.Name.Color = col
     Holder.Name.Outline = true
@@ -95,7 +95,7 @@ Esp.Add = function(plr, root, col)
     Holder.Distance.Size = Esp.Settings.TextSize
     Holder.Distance.Center = true
 	Holder.Distance.Color = col
-    Holder.Distance.Font = Drawing.Fonts[Esp.Settings.TextFont]
+    Holder.Distance.Font = Esp.Settings.TextFont
 	Holder.Distance.Outline = true
 
 	Holder.Tracer.From = TracerStart
@@ -105,11 +105,11 @@ Esp.Add = function(plr, root, col)
 	Holder.Connection = game:GetService("RunService").Stepped:Connect(function()
 		if Esp.Settings.Enabled then
 			local Pos, Vis = WorldToViewportPoint(Camera, root.Position)
+
 			if Vis then
 				local X = 2200 / Pos.Z
 				local BoxSize = v2new(X, X * 1.4)
 				local Health = Esp.GetHealth(plr)
-				Holder.Name.Position = v2new(Pos.X, Pos.Y - BoxSize.X / 2 - (4 + Esp.Settings.TextSize))
 
 				Holder.Box.Size = BoxSize
 				Holder.Box.Position = v2new(Pos.X - BoxSize.X / 2, Pos.Y - BoxSize.Y / 2)
@@ -120,15 +120,20 @@ Esp.Add = function(plr, root, col)
 				Holder.Box2.Size = v2new(BoxSize.X - 1, BoxSize.Y - 1)
 				Holder.Box2.Position = v2new((Pos.X - BoxSize.X / 2) + 2, (Pos.Y - BoxSize.Y / 2) + 2)
 
-				Holder.Health.Color = Health > 0.66 and Color3.new(0, 1, 0) or Health < 0.33 and Color3.new(1, 0, 0) or Color3.new(1, 1, 0)
+				Holder.Health.Color = Color3.fromRGB(255 - ((Health / 100) * 255), (Health / 100) * 255, 0)
 				Holder.Health.Size = v2new(1.5, BoxSize.Y * Health)
 				Holder.Health.Position = v2new(Pos.X - (BoxSize.X / 2 + 4), (Pos.Y - BoxSize.Y / 2) + ((1 - Health) * BoxSize.Y))
 
 				Holder.Distance.Text = math.floor((root.Position - Camera.CFrame.Position).Magnitude) .. " Studs"
 				Holder.Distance.Position = v2new(Pos.X, Pos.Y + BoxSize.X / 2 + 4)
+				Holder.Distance.Font = Esp.Settings.TextFont
+
+				Holder.Name.Position = v2new(Pos.X, Pos.Y - BoxSize.X / 2 - (4 + Esp.Settings.TextSize))
+				Holder.Name.Font = Esp.Settings.TextFont
 
 				Holder.Tracer.To = v2new(Pos.X, Pos.Y + BoxSize.Y / 2)
 			end
+			
 			CheckVis(Holder, Vis)
 		elseif Holder.Name.Visible then
 			Holder.Name.Visible = false
@@ -160,7 +165,7 @@ end)
 
 Esp.TeamCheck = newcclosure(function(plr)
 	return plr.Team == Player.Team
-end) -- can be overwritten for games that don't use default teams
+end)
 if game.PlaceId == 3233893879 then
     Esp.TeamCheck = newcclosure(function(plr)
         local Module = game:GetService("ReplicatedStorage").TS
@@ -170,7 +175,7 @@ if game.PlaceId == 3233893879 then
 end
 Esp.GetHealth = newcclosure(function(plr)
 	return plr.Character.Humanoid.Health / plr.Character.Humanoid.MaxHealth
-end) -- can be overwritten for games that don't use default characters
+end)
 if game.PlaceId == 292439477 then
     local GetPlayerHealthTable
     for I,V in pairs(getgc(true)) do
@@ -182,6 +187,7 @@ if game.PlaceId == 292439477 then
         return GetPlayerHealthTable:getplayerhealth(plr) / 100
     end)
 end
+
 Esp.UpdateTextSize = newcclosure(function(num)
 	Esp.Settings.TextSize = num
 	for i, v in next, Esp.Container do
