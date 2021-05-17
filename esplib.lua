@@ -51,6 +51,7 @@ Esp.Add = function(plr, root, col)
 		Container.Box1:Remove()
 		Container.Box2:Remove()
 		Container.Health:Remove()
+		Container.HealthBack:Remove()
 		Container.Distance:Remove()
 		Container.Tracer:Remove()
 		Esp.Container[root] = nil
@@ -61,6 +62,7 @@ Esp.Add = function(plr, root, col)
 		Box1 = Drawing.new("Square"),
 		Box2 = Drawing.new("Square"),
 		Health = Drawing.new("Square"),
+		HealthBack = Drawing.new("Square"),
 		Distance = Drawing.new("Text"),
 		Tracer = Drawing.new("Line"),
 		Player = plr,
@@ -91,6 +93,10 @@ Esp.Add = function(plr, root, col)
 	Holder.Health.Thickness = 1
 	Holder.Health.Color = Color3.fromRGB(0, 255, 0)
     Holder.Health.Filled = true
+
+	Holder.HealthBack.Thickness = 1
+	Holder.HealthBack.Color = Color3.fromRGB(0, 0, 0)
+    Holder.HealthBack.Filled = true
 
     Holder.Distance.Size = Esp.Settings.TextSize
     Holder.Distance.Center = true
@@ -135,6 +141,9 @@ Esp.Add = function(plr, root, col)
 				Holder.Health.Color = Color3.fromRGB(255 - ((Health / 100) * 255), (Health / 100) * 255, 0)
 				Holder.Health.Size = v2new(1.5, BoxSize.Y * Health)
 				Holder.Health.Position = v2new(Pos.X - (BoxSize.X / 2 + 4), (Pos.Y - BoxSize.Y / 2) + ((1 - Health) * BoxSize.Y))
+
+				Holder.HealthBack.Size = v2new(1.7, (BoxSize.Y * 100) + 2)
+				Holder.HealthBack.Position = v2new(Pos.X - (BoxSize.X / 2 + 4) - 1, (Pos.Y - BoxSize.Y / 2) + ((1 - Health) * BoxSize.Y) - 1)
 
 				Holder.Distance.Text = math.floor((root.Position - Camera.CFrame.Position).Magnitude) .. " Studs"
 				Holder.Distance.Position = v2new(Pos.X, Pos.Y + BoxSize.X / 2 + 4)
