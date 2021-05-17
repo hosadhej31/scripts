@@ -107,7 +107,19 @@ Esp.Add = function(plr, root, col)
 			local Pos, Vis = WorldToViewportPoint(Camera, root.Position)
 
 			if Vis then
-				local X = 2200 / Pos.Z
+				local Part = root.Position
+                local CF = CFrame.new(Part.CFrame.p, workspace.CurrentCamera.CFrame.p)
+                local Size = Part.Size * Vector3.new(1, 1.5)
+                local Sizes = {
+                    TopRight = (CF * CFrame.new(-Size.X, -Size.Y, 0)).Position,
+                    BottomRight = (CF * CFrame.new(-Size.X, Size.Y, 0)).Position,
+                    TopLeft = (CF * CFrame.new(Size.X, -Size.Y, 0)).Position,
+                    BottomLeft = (CF * CFrame.new(Size.X, Size.Y, 0)).Position,
+                }
+
+                local TopLeft = workspace.CurrentCamera:WorldToScreenPoint(Sizes.TopLeft)
+                local BottomLeft = workspace.CurrentCamera:WorldToScreenPoint(Sizes.BottomLeft)
+				local X = TopLeft.X - BottomLeft.X
 				local BoxSize = v2new(X, X * 1.4)
 				local Health = Esp.GetHealth(plr)
 
