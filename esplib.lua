@@ -113,9 +113,8 @@ Esp.Add = function(plr, root, col)
 			local Pos, Vis = WorldToViewportPoint(Camera, root.Position)
 
 			if Vis then
-				local Part = root
-                local CF = CFrame.new(Part.CFrame.p, workspace.CurrentCamera.CFrame.p)
-                local Size = Part.Size * Vector3.new(1, 1.5)
+                local CF = CFrame.new(root.Position, workspace.CurrentCamera.CFrame.p)
+                local Size = root.Size * Vector3.new(1, 1.5)
                 local Sizes = {
                     TopRight = (CF * CFrame.new(-Size.X, -Size.Y, 0)).Position,
                     BottomRight = (CF * CFrame.new(-Size.X, Size.Y, 0)).Position,
