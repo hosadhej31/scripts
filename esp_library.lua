@@ -315,4 +315,4 @@ function module:Init()
     end)
 end
 
-return
+return module
