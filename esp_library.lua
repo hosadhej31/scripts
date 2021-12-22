@@ -210,7 +210,7 @@ function module:AddEsp(Player)
                 Retainer.healthbarobject.Size = HealthbarSize
                 Retainer.healthbarobject.Position = HealthbarPosition
 
-                Retainer.healthbaroutlineobject.Size = HealthbarSize
+                Retainer.healthbaroutlineobject.Size = Vector2.new(HealthbarSize.X, BoxSize.Y)
                 Retainer.healthbaroutlineobject.Position = HealthbarPosition
 
                 Retainer.tracerobject.Visible = self.settings.tracers
