@@ -311,7 +311,7 @@ function module:Init()
     end)
 
     Players.PlayerRemoving:Connect(function(Player)
-        self:AddEsp(Player)
+        self:RemoveEsp(Player)
     end)
 end
 
