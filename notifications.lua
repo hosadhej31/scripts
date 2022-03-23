@@ -24,9 +24,9 @@ local function IsInArea(Object)
     return (Mouse.X > Object.Position.X and Mouse.X < Object.Position.X + Object.Size.X) and (Mouse.Y > Object.Position.Y and Mouse.Y < Object.Position.Y + Object.Size.Y)
 end
 
-function NotificationsLib:Window(Title, Description, Callback)
+function NotificationsLib:Window(Title, Description, Size, Callback)
     local WindowUtils = {}
-    local MainSize = Vector2.new(350, 125)
+    local MainSize = Size or Vector2.new(350, 125)
 
     local DarkOutlineBox = Create("Square", {
         Visible = true,
