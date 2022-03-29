@@ -30,19 +30,8 @@ local client = {}; do
         client.roundsystem = debug.getupvalue(client.hud.spot, 6)
         client.menu = debug.getupvalue(client.hud.radarstep, 1)
         client.loadplayer = debug.getupvalue(client.replication.getupdater, 2)
-        client.remoteevent = client.network and debug.getupvalue(client.network.send, 1)
-        client.networkfunctions = client.remoteevent and debug.getupvalue(getconnections(client.remoteevent.OnClientEvent)[1].Function, 1)
 
         setreadonly(client.particle, false)
-
-        for i,v in pairs(client.networkfunctions) do
-            local Constants = debug.getconstants(v)
-
-            if (table.find(Constants, "KNIFE") and table.find(Constants, "GRENADE")) then
-                client.loadgun = debug.getupvalue(v, 6)
-                client.loadknife = debug.getupvalue(v, 7)
-            end
-        end
     end)()
 end
 return client
