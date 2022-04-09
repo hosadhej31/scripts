@@ -22,6 +22,7 @@ local client = {}; do
         client.screencull = Modules.ScreenCull
         client.raycast = Modules.Raycast
         client.bulletcheck = Modules.BulletCheck
+        client.replicationsmoother = Modules.ReplicationSmoother
         client.trajectory = require(Modules.scripts.physics:Clone()).trajectory
         client.replication = debug.getupvalue(client.camera.setspectate, 1)
         client.char = debug.getupvalue(client.camera.step, 7)
